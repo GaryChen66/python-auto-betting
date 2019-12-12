@@ -425,6 +425,7 @@ class Bettingbot:
 
         print("  A B C status, risk index, delta: ", self.statusA, self.statusB, self.statusC, self.index, self.delta)
         print(" count: ", self.count)
+    
     # is stop now?
     def is_stop(self):
         if self.count >= self.maxcount or self.currenttimes >= self.totaltimes or self.statusB == 2:
@@ -474,15 +475,20 @@ def betting_job(bot):
     bot.get_status()
     bot.is_stop()
 
+#running the main funtion
 if __name__ == "__main__":
+
+    #initialize settings
     username = "lukicama"
     password = "testingbot12345"
     site_url = "https://www.lutrija.hr/lotokladenjestaro"
     result_url = "https://www.lutrija.hr/igraj/user/gamesHistory.html"
     
+    #Set memory for betting bot class
     bot = Bettingbot(username, password, site_url, result_url)
     bot.get_exceldata()
     
+    #Set time
     set_time(bot.bet_type)
     bot.set_ka()
     bot.set_kb()
@@ -494,9 +500,11 @@ if __name__ == "__main__":
     bot.get_nextstake(bot.statusA, bot.statusB)
     """
 
+    #time loop
     for at_time in time_run:
         schedule.every().day.at(at_time).do(betting_job, bot)
 
+    #loop continuously
     while bot.trigger == 1 :
         try:
             schedule.run_pending()
@@ -505,9 +513,8 @@ if __name__ == "__main__":
             print("Warning: exception occured")
             continue
 
+    #End application
     print("End")
     bot.closedriver()
     filename = datetime.now().strftime("%Y-%m-%d %H_%M") + '.xls'
     bot.outworkbook.save(filename)
-  
-    
